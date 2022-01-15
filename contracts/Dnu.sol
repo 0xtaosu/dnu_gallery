@@ -13,11 +13,8 @@ contract Dnu is ERC721, Ownable, AccessControl {
     // Counter of NFT
     uint256 public tokenCounter;
 
-    // URI of Zero NFT
-    string public zeroTokenURI;
-
-    // URI of Basis NFT
-    string public baseTokenURI;
+    // IPFS Folder Hash of NFT
+    string public baseURI;
 
     // Mapping of (tokenId,tokenURI)
     mapping(uint256 => string) private _tokenURIs;
@@ -48,22 +45,14 @@ contract Dnu is ERC721, Ownable, AccessControl {
         return super.supportsInterface(interfaceId);
     }
 
-    /**
-     *@dev Set the URI of Zero NFT
-     *@param tokenURI the URI of Zero's metadata
-     */
-    function setZeroTokenURI(string memory tokenURI) public onlyOwner {
-        require(bytes(tokenURI).length > 0 ,"Zero NFT's URI should not be null");
-        zeroTokenURI = tokenURI;
-    }
 
     /**
      *@dev Set the URI of basis NFT
-     *@param tokenURI the URI of basis's metadata
+     *@param uri IPFS Folder Hash of NFT
      */
-    function setBaseTokenURI(string memory tokenURI) public onlyOwner {
-        require(bytes(tokenURI).length > 0 ,"Basis NFT's URI should not be null");
-        baseTokenURI = tokenURI;
+    function setBaseURI(string memory uri) public onlyOwner {
+        require(bytes(uri).length > 0 ,"NFT's URI should not be null");
+        baseURI = uri;
     }
 
     /**
@@ -86,22 +75,22 @@ contract Dnu is ERC721, Ownable, AccessControl {
     }
 
     /**
-     *@dev mint an Zero NFT
+     *@dev Check the mined
+     *@param member the address of members
+     *@return have the member role
      */
-    function mintZero() public onlyOwner {
-        _safeMint(msg.sender, tokenCounter);
-        _setTokenURI(tokenCounter, zeroTokenURI);
-
-        tokenCounter++;
+    function checkMined(address member) public view returns (bool) {
+        return _minted[member];
     }
+    
 
     /**
      *@dev mint an basis NFT
      */
     function mint() public onlyRole(MEMBER_ROLE) {
-        require(!_minted[msg.sender], "You have minted a NFT");
+        require(!_minted[msg.sender], "You have minted a NFT or Not in the whitelist");
         _safeMint(msg.sender, tokenCounter);
-        _setTokenURI(tokenCounter, baseTokenURI);
+        _setTokenURI(tokenCounter, string(abi.encodePacked("ipfs://",baseURI,"/",tokenCounter,".json")));
 
         tokenCounter++;
         _minted[msg.sender] = true;
@@ -110,9 +99,9 @@ contract Dnu is ERC721, Ownable, AccessControl {
     /**
      *@dev mint more basis NFT by Owner
      */
-    function mintMore() public onlyOwner {
+    function mintAdmin() public onlyOwner {
         _safeMint(msg.sender, tokenCounter);
-        _setTokenURI(tokenCounter, baseTokenURI);
+        _setTokenURI(tokenCounter, baseURI);
 
         tokenCounter++;
     }
