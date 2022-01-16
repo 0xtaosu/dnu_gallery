@@ -8,6 +8,8 @@ import "@openzeppelin/contracts/utils/Strings.sol";
  *@dev DNU NFT
  */
 contract Dnu is ERC721, Ownable, AccessControl {
+    using Strings for uint256;
+
     // Member role
     bytes32 public constant MEMBER_ROLE = keccak256("MEMBER_ROLE");
 
@@ -108,18 +110,17 @@ contract Dnu is ERC721, Ownable, AccessControl {
     }
     /**
      *@dev set the tokenURI
-     *@param _tokenId Id of NFT
-     *@param _tokenURI URI of NFt
+     *@param tokenId Id of NFT
      */
-    function _setTokenURI(uint256 _tokenId, string memory _tokenURI)
+    function _setTokenURI(uint256 tokenId)
         internal
         virtual
     {
         require(
-            _exists(_tokenId),
+            _exists(tokenId),
             "ERC721Metadata: URI set of nonexistent token"
         ); // Checks if the tokenId exists
-         _tokenURIs[_tokenId] = bytes(baseURI).length > 0 ? string(abi.encodePacked(baseURI, _tokenId.toString())) : "";
+         _tokenURIs[tokenId] = bytes(baseURI).length > 0 ? string(abi.encodePacked(baseURI, tokenId.toString())) : "";
     }
 
     /**
