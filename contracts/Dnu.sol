@@ -2,6 +2,7 @@ pragma solidity 0.8.4;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
 /**
  *@dev DNU NFT
@@ -13,7 +14,7 @@ contract Dnu is ERC721, Ownable, AccessControl {
     // Counter of NFT
     uint256 public tokenCounter;
 
-    // IPFS Folder Hash of NFT
+    // IPFS Folder Hash of NFT , like ipfs://xyz/
     string public baseURI;
 
     // Mapping of (tokenId,tokenURI)
@@ -90,7 +91,7 @@ contract Dnu is ERC721, Ownable, AccessControl {
     function mint() public onlyRole(MEMBER_ROLE) {
         require(!_minted[msg.sender], "You have minted a NFT or Not in the whitelist");
         _safeMint(msg.sender, tokenCounter);
-        _setTokenURI(tokenCounter, string(abi.encodePacked("ipfs://",baseURI,"/",tokenCounter,".json")));
+        _setTokenURI(tokenCounter);
 
         tokenCounter++;
         _minted[msg.sender] = true;
@@ -101,7 +102,7 @@ contract Dnu is ERC721, Ownable, AccessControl {
      */
     function mintAdmin() public onlyOwner {
         _safeMint(msg.sender, tokenCounter);
-        _setTokenURI(tokenCounter, baseURI);
+        _setTokenURI(tokenCounter);
 
         tokenCounter++;
     }
@@ -118,7 +119,7 @@ contract Dnu is ERC721, Ownable, AccessControl {
             _exists(_tokenId),
             "ERC721Metadata: URI set of nonexistent token"
         ); // Checks if the tokenId exists
-        _tokenURIs[_tokenId] = _tokenURI;
+         _tokenURIs[_tokenId] = bytes(baseURI).length > 0 ? string(abi.encodePacked(baseURI, _tokenId.toString())) : "";
     }
 
     /**
