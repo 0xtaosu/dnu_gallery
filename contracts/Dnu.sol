@@ -16,8 +16,8 @@ contract Dnu is ERC721, Ownable, AccessControl {
     // Counter of NFT
     uint256 public tokenCounter;
 
-    // IPFS Folder Hash of NFT , like ipfs://xyz/
-    string public baseURI;
+    // The last IPFS Folder URI of NFT , like ipfs://xyz/
+    string public lastBaseURI;
 
     // Mapping of (tokenId,tokenURI)
     mapping(uint256 => string) private _tokenURIs;
@@ -50,12 +50,12 @@ contract Dnu is ERC721, Ownable, AccessControl {
 
 
     /**
-     *@dev Set the URI of basis NFT
-     *@param uri IPFS Folder Hash of NFT
+     *@dev Set the last IPFS Folder URI of NFT
+     *@param uri The URI of IPFS Folder of NFT
      */
-    function setBaseURI(string memory uri) public onlyOwner {
+    function setlastBaseURI(string memory uri) public onlyOwner {
         require(bytes(uri).length > 0 ,"NFT's URI should not be null");
-        baseURI = uri;
+        lastBaseURI = uri;
     }
 
     /**
@@ -120,7 +120,7 @@ contract Dnu is ERC721, Ownable, AccessControl {
             _exists(tokenId),
             "ERC721Metadata: URI set of nonexistent token"
         ); // Checks if the tokenId exists
-         _tokenURIs[tokenId] = bytes(baseURI).length > 0 ? string(abi.encodePacked(baseURI, tokenId.toString())) : "";
+         _tokenURIs[tokenId] = bytes(lastBaseURI).length > 0 ? string(abi.encodePacked(lastBaseURI, tokenId.toString())) : "";
     }
 
     /**
